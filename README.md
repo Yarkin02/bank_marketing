@@ -60,9 +60,9 @@ Bu değişkenler kullanılarak, çaprazlamalar, görselleştirmeler yapılmış 
 ## Yöntem
 
 Veri üzerinde yapılan incelemeler ve görselleştirmeler sonucunda bağımlı değişkendeki sınıflar arasında dengesizlik olduğu saptanmıştır. Vadeli mevduata **abone olan** kişi sayısı 5289, **abone olmayan** kişi sayısı ise 39922'dir.
-Projenin amacı potansiyel müşterilerin tespit edilmesi olduğu için ve makine öğrenmesi algoritmaları, dengeli veri setlerinde daha iyi çalıştığından bu dengesizliğin ortadan kaldırılması gerekmektedir. Bu kapsamda sentetik veri üreterek dengesizlik sorunu çözülmektedir. Projede örnekleme yöntemi kullanılmadan ve 5 farklı örnekleme yöntemi kullanılarak performansları açısından karşılaştırma yapılmıştır. Kullanılan aşırı örnekleme ve eksik örnekleme teknikleri şunlardır;
+Projenin amacı potansiyel müşterilerin tespit edilmesi olduğu için ve makine öğrenmesi algoritmaları, dengeli veri setlerinde daha iyi çalıştığından bu dengesizliğin ortadan kaldırılması gerekmektedir. Bu kapsamda sentetik veri üreterek dengesizlik sorunu çözülmektedir. Projede örnekleme yöntemi kullanılmadan ve 5 farklı örnekleme yöntemi ve 6 farklı makine öğrenmesi algoritması kullanılarak performansları açısından karşılaştırma yapılmıştır. Kullanılan aşırı örnekleme, eksik örnekleme teknikleri ve makine öğrenmesi algoritmaları şunlardır;
 
-### Aşırı Örnekleme Teknikleri;
+### Kullanılan Aşırı Örnekleme Teknikleri;
 
 - **Random Over Sampler**
 
@@ -70,12 +70,71 @@ Projenin amacı potansiyel müşterilerin tespit edilmesi olduğu için ve makin
 
 - **BorderLine Smote**
 
-### Azınlık Örnekleme Teknikleri;
+### Kullanılan Azınlık Örnekleme Teknikleri;
 
 - **Random Under Sampler**
 
 - **TomekLinks**
 
+### Kullanılan Makine Öğrenmesi Algoritmaları;
 
+- **Lojistik Regresyon**
 
+- **Destek Vektör Makineleri (SVM)**
 
+- **Rastgele Orman**
+
+- **Karar Ağaçları**
+
+- **k-En Yakın Komşu (k-NN)**
+
+Kurulan modellerde “Random_state” parametresi dışında herhangi bir parametre kullanılmamıştır. Modeller değerlendirme aşamasında her bir sınıflandırma algoritması ve örnekleme metotları için, Kesinlik (Precision), Duyarlılık (Recall), F1- Skor (F1-Score), ROC Alanı (ROC Curve), Aucpr hesaplanmıştır. Uygun modeli seçerken bu değerlerin her bir metrik için en yüksek olması beklenir fakat amacımız azınlık sınıfının daha iyi tahmin edilmesi için önceliğimiz F1-Skor ve Aucpr olacaktır. Bu koşullar altında en iyi performansı Aşırı Örnekleme Metodu BorderLine Smote kullanılan Rastgele Orman algoritması göstermektedir. Azınlık sınıfına ait elde ettiğimiz değerler şu şekildedir;
+
+- Aucpr : 0.5085
+- Roc Auc : 0.7681
+- F1-score : 0.5481
+- Recall : 0.6117
+- Precision : 0.4964
+
+## Model İyileştirilmesi
+
+Model iyileştirilmesi amacıyla, Resampling, Sampling_Strategy ve Model Tunning işlemleri uygulanmıştır.
+
+1-) Resampling : Vadeli mevduata abone olmayan 39922 kişiden 20000 kişi rastgele olarak seçilmiştir.
+
+2-) Sampling_strategy : En iyi performans sampling_strategy = {1: 16000, 2: 13000} ile alınmıştır.
+
+3-) Model Tunning : Bu aşamada, n_estimator(Ağaç sayısı), max_depth(Maksimum Derinlik), min_samples_split(Bir iç düğümün bölünmesi için gereken minimum örnekleme sayısı), min_samples_leaf(Bir yaprak düğümünün oluşturulması için gereken minimum örnekleme sayısı) hiperparametreleri Optuna kütüphanesi ile tune edilmiştir. Azınlık sınıfı için en yüksek f1-skorunu veren hiperparametre değerleri şu şekildedir. 
+
+- n_estimators = 222
+- max_depth = 38
+- min_samples_split = 2
+- min_samples_leaf = 1
+
+## Sonuç
+
+Yapılan bu işlemler sonrasında en iyi performansı Random Over Sampling'li Random Forest algoritması vermiştir.
+
+İyileştirmeler sonrası elde edilen tüm değeler şu şekildedir;
+
+- Train Cross-Validation Scores : [0.93839635 0.94148415 0.94197388 0.944939 0.94459103]
+
+- Test Cross-Validation Scores : [0.90853659 0.91736527 0.92961165 0.91521347 0.91927711]
+
+- - - - - - - - - - - - - - - - - - - - - - - - - 
+              
+              precision    recall  f1-score   support
+
+           1       0.93      0.91      0.92      4000
+           2       0.69      0.72      0.71      1058
+
+    accuracy                           0.87      5058
+    macro avg       0.81     0.82      0.81      5058
+    weighted avg    0.88     0.87      0.88      5058
+
+    Roc Auc : 0.8184
+    Aucpr : 0.7473
+    
+- - - - - - - - - - - - - - - - - - - - - - - - - 
+
+Azınlık sınıfına ait F1-skoru 0.5481 değerinden 0.71'e kadar çekilmiştir. Test - Train CV değerleri arasında büyük farklılıklar gözlemlenmediği için modelde herhangi bir Overfit durumu yoktur. Genelleme yeteneği yüksek, dengeli, maliyeti düşük bir model elde edilmiştir.
