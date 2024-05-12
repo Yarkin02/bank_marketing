@@ -1,4 +1,4 @@
-# **Banka Pazarlama Veri Seti Üzerinde Sınıflandırma**
+# **Potansiyel Banka Müşterilerin Makine Öğrenmesi Teknikleri ile Tahmin Edilmesi**
 
 ## Problem Tanımı
 Bu projede, bir Portekiz bankasının 2008-2010 yılları arasındaki telefonla pazarlama çabalarının kayıtlarını içeren bir veri seti üzerinde çalışılmıştır. Bankanın gelecek kampanyalarında daha fazla müşteriyi banka mevduatına abone olmaya ikna etmek için en etkili taktikleri belirlemek amacıyla makine öğrenimi teknikleri uygulanmıştır. Veri seti, 45211 veri örneği ve 17 özellikten oluşmaktadır. Bu proje, bankanın pazarlama stratejilerini iyileştirmek için makine öğrenimi algoritmalarını kullanmayı amaçlamaktadır.
